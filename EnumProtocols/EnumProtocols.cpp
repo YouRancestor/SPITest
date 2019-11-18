@@ -5,6 +5,7 @@
 #endif
 
 #include <winsock2.h>
+#include <WS2spi.h>
 #include <ws2tcpip.h>
 #include <objbase.h>
 #include <stdio.h>
@@ -52,8 +53,8 @@ int wmain()
         WSACleanup();
         return 1;
     }
-
-    iNuminfo = WSAEnumProtocols(NULL, lpProtocolInfo, &dwBufferLen);
+    int err;
+    iNuminfo = WSCEnumProtocols(NULL, lpProtocolInfo, &dwBufferLen, &err);
     if (iNuminfo == SOCKET_ERROR) {
         iError = WSAGetLastError();
         if (iError != WSAENOBUFS) {
