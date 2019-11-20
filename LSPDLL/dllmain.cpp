@@ -17,6 +17,9 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     {
     case DLL_PROCESS_ATTACH:
         GetModuleFileNameW(0, exepath, MAX_PATH * sizeof(wchar_t));
+        WCHAR strTip[MAX_PATH + 100];
+        wsprintf(strTip, L"Application %s loaded LSPDLL.dll！", exepath);
+        MessageBoxW(0, strTip, L"Tip", MB_OK);
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
@@ -117,8 +120,8 @@ int WSPAPI WSPStartup(
 )
 {
     WCHAR strTip[MAX_PATH +100];
-    wsprintf(strTip, L"应用程序 %s 加载了LSPDLL.dll！", exepath);
-    MessageBoxW(0, strTip, L"Tip", MB_OK);
+    wsprintf(strTip, L"LSPDLL.dll: Function WSPStartup is invoked.");
+    MessageBoxW(0, strTip, exepath, MB_OK);
     //如果协议位分层协议或基础协议,那么返回错误
     if (lpProtocolInfo->ProtocolChain.ChainLen <= 1)
     {   //无法加载或初始化请求的服务提供程序

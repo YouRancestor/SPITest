@@ -20,7 +20,7 @@
 
 int wmain()
 {
-
+    system("pause");
     //-----------------------------------------
     // Declare and initialize variables
     WSADATA wsaData;

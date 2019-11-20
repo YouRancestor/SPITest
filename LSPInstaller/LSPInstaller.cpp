@@ -46,6 +46,27 @@ bool FindLayeredChain(GUID guid, LPWSAPROTOCOL_INFO info)
     return ret;
 }
 
+bool FindBaseProtocol(LPWSAPROTOCOL_INFO info)
+{
+    bool ret = false;
+    DWORD dwBufferLen = 16384;
+    LPWSAPROTOCOL_INFO lpProtocolInfo = (LPWSAPROTOCOL_INFO)HeapAlloc(GetProcessHeap(), 0, dwBufferLen);
+    INT err;
+    INT num = WSCEnumProtocols(NULL, lpProtocolInfo, &dwBufferLen, &err);
+
+    for (INT i = 0; i < num; ++i)
+    {
+        if (lpProtocolInfo[i].iProtocol == IPPROTO_TCP && lpProtocolInfo[i].iMaxSockAddr==16)
+        {
+            ret = true;
+            *info = lpProtocolInfo[i];
+            break;
+        }
+    }
+    HeapFree(GetProcessHeap(), 0, lpProtocolInfo);
+    return ret;
+}
+
 int ReOrderToFirst(LPWSAPROTOCOL_INFO info)
 {
     DWORD dwBufferLen = 16384;
@@ -86,6 +107,10 @@ int ReOrderToFirst(LPWSAPROTOCOL_INFO info)
 
 int main(int argc, char* argv[])
 {
+    system("pause");
+    printf("Attempting to load dll %s.", argv[1]);
+    HMODULE h = LoadLibrary(argv[1]);
+    FreeLibrary(h);
     printf("Installing %s ...\n", argv[1]);
 
     GUID guid;
@@ -142,6 +167,13 @@ int main(int argc, char* argv[])
         return 3;
     }
 
+    WSAPROTOCOL_INFO baseProtocol;
+
+    if (!FindBaseProtocol(&baseProtocol))
+    {
+        return 4;
+    }
+
     /*
         WSAPROTOCOL_INFO::dwServiceFlags1
  TCP UDP
@@ -190,7 +222,7 @@ int main(int argc, char* argv[])
     tcp->iAddressFamily = AF_INET;
     tcp->ProtocolChain.ChainLen = 2;
     tcp->ProtocolChain.ChainEntries[0] = layeredProtocol.dwCatalogEntryId;
-    tcp->ProtocolChain.ChainEntries[1] = 1007;
+    tcp->ProtocolChain.ChainEntries[1] = baseProtocol.dwCatalogEntryId;
     tcp->iMaxSockAddr = 16;
     tcp->iMinSockAddr = 16;
     tcp->ProviderId = guid2;
