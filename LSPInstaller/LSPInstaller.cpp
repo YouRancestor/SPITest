@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
         return 2;
     }
 
-    ReOrderToFirst(&layeredProtocol);
+    //ReOrderToFirst(&layeredProtocol);
 
     WSAPROTOCOL_INFO testProtocol[3]; //数组成员为TCP、UDP、原始的目录入口信息
     ZeroMemory(&testProtocol, sizeof(WSAPROTOCOL_INFO)*3);
@@ -229,6 +229,7 @@ int main(int argc, char* argv[])
     memcpy(tcp->szProtocol, protocolName, sizeof(protocolName));
     tcp->dwProviderFlags = PFL_MATCHES_PROTOCOL_ZERO;
     tcp->iVersion = 2;
+    tcp->iSocketType = SOCK_STREAM;
 
     // UDP
     //WSAPROTOCOL_INFO* udp = &testProtocol[1];
