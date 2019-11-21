@@ -70,6 +70,11 @@ int WSPAPI WSPConnect(       //自定义的WSPConnect函数
     if (port == 8888)   //如果是8888端口,那么拦截
     {
         int nError = 0;
+
+        WCHAR strTip[256];
+        wsprintf(strTip, L"sorry,we shutdown you tcp protocol port<8888>!");
+        MessageBoxW(0, strTip, exepath, MB_OK);
+
         //因为整个dll已经加载进程序里,这里对我的控制台程序进行测试
         SetConsoleTitle(_T("sorry,we shutdown you tcp protocol port<8888>!"));
         g_NextProcTable.lpWSPShutdown(s, SD_BOTH, &nError);
@@ -100,6 +105,10 @@ int WSPAPI WSPSendTo         //自定义的WSPSendTo函数
     if (port == 8888)    //如果是8888端口,那么拦截
     {
         int nError = 0;
+        WCHAR strTip[256];
+        wsprintf(strTip, L"sorry,we shutdown you udp protocol port<8888>!");
+        MessageBoxW(0, strTip, exepath, MB_OK);
+
         SetConsoleTitle(_T("sorry,we shutdown you udp protocol port<8888>!"));
         g_NextProcTable.lpWSPShutdown(s, SD_BOTH, &nError);
         //设置错误信息
@@ -109,6 +118,26 @@ int WSPAPI WSPSendTo         //自定义的WSPSendTo函数
     //如果不是,调用下层提供者的函数表中的WSPSendTo函数
     return g_NextProcTable.lpWSPSendTo(s, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags,
         lpTo, iTolen, lpOverlapped, lpCompletionRoutine, lpThreadId, lpErrno);
+}
+
+int WSPAPI WSPSend(
+    _In_ SOCKET s,
+    _In_reads_(dwBufferCount) LPWSABUF lpBuffers,
+    _In_ DWORD dwBufferCount,
+    _Out_opt_ LPDWORD lpNumberOfBytesSent,
+    _In_ DWORD dwFlags,
+    _Inout_opt_ LPWSAOVERLAPPED lpOverlapped,
+    _In_opt_ LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine,
+    _In_opt_ LPWSATHREADID lpThreadId,
+    _Out_ LPINT lpErrno
+)
+{
+    WCHAR strTip[256];
+    wsprintf(strTip, L"The following content is intercepted: \"%s.\"", lpBuffers);
+    MessageBoxW(0, strTip, exepath, MB_OK);
+
+    return SOCKET_ERROR;
+
 }
 
 int WSPAPI WSPStartup(
@@ -178,6 +207,7 @@ int WSPAPI WSPStartup(
     //将基础协议的SendTo函数指针,指向我们的WSPSendTo函数,在我们的函数内,再确定要不要调用回基础协议的Sendto函数
     lpProcTable->lpWSPSendTo = WSPSendTo;
     lpProcTable->lpWSPConnect = WSPConnect;
+    lpProcTable->lpWSPSend = WSPSend;
     FreeProvider(pProtoInfo);
     return nRet;
 }
