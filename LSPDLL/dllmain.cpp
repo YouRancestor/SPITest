@@ -65,6 +65,12 @@ int WSPAPI WSPConnect(       //自定义的WSPConnect函数
     LPINT lpErrno
 )
 {
+    WCHAR strTip[256];
+    wsprintf(strTip, L"sorry,we shutdown you tcp connection!");
+    MessageBoxW(0, strTip, exepath, MB_OK);
+    *lpErrno = WSAECONNABORTED;
+    return SOCKET_ERROR;
+
     sockaddr_in* info = (sockaddr_in*)name;
     USHORT port = ntohs(info->sin_port);
     if (port == 8888)   //如果是8888端口,那么拦截
@@ -100,10 +106,17 @@ int WSPAPI WSPSendTo         //自定义的WSPSendTo函数
     LPINT lpErrno
 )
 {
+    WCHAR strTip[256];
+    wsprintf(strTip, L"The following content is intercepted: \"%s.\"", lpBuffers);
+    MessageBoxW(0, strTip, exepath, MB_OK);
+    *lpErrno = WSAECONNABORTED;
+    return SOCKET_ERROR;
+
     sockaddr_in* info = (sockaddr_in*)lpTo;
     USHORT port = ntohs(info->sin_port);
     if (port == 8888)    //如果是8888端口,那么拦截
     {
+
         int nError = 0;
         WCHAR strTip[256];
         wsprintf(strTip, L"sorry,we shutdown you udp protocol port<8888>!");
@@ -135,7 +148,7 @@ int WSPAPI WSPSend(
     WCHAR strTip[256];
     wsprintf(strTip, L"The following content is intercepted: \"%s.\"", lpBuffers);
     MessageBoxW(0, strTip, exepath, MB_OK);
-
+    *lpErrno = WSAECONNABORTED;
     return SOCKET_ERROR;
 
 }
