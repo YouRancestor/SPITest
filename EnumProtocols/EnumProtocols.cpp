@@ -107,6 +107,17 @@ int wmain()
         else
             wprintf(L"Layered Chain Entry\n");
 
+        {
+            int nError = 0;
+            TCHAR szBaseProviderDll[MAX_PATH];
+            int nLen = MAX_PATH;
+
+            WSCGetProviderPath(&lpProtocolInfo[i].ProviderId, szBaseProviderDll, &nLen, &nError);
+
+            wprintf(L"DLL Path:\t\t\t %ws\n", szBaseProviderDll);
+
+        }
+
         wprintf(L"Protocol:\t\t\t %ws\n", lpProtocolInfo[i].szProtocol);
 
         iRet =

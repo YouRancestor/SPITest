@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
     ReOrderToFirst(tcp);
 
     printf("Installed\n");
-
+    return 0;
     printf("Press any key to uninstall LSP DLL ...\n");
 
     getchar();
